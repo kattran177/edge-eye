@@ -1,0 +1,5 @@
+FROM python:3.11-slim
+WORKDIR /app
+RUN pip install --no-cache-dir ultralytics paho-mqtt
+COPY src/ src/
+CMD ["python", "-m", "src.edge.simulator"]

@@ -1,0 +1,78 @@
+services:
+  mosquitto:
+    image: eclipse-mosquitto:2
+    ports:
+      - "1883:1883"
+    volumes:
+      - ./infra/docker/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: edgeeye
+      POSTGRES_PASSWORD: edgeeye
+      POSTGRES_DB: edgeeye
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U edgeeye"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  processor:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile.processor
+    environment:
+      MQTT_BROKER: mosquitto
+      DATABASE_URL: postgresql://edgeeye:edgeeye@postgres:5432/edgeeye
+    depends_on:
+      mosquitto:
+        condition: service_started
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+  edge-cam-01:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile.edge
+    environment:
+      MQTT_BROKER: mosquitto
+      DEVICE_ID: cam-01
+      DETECTION_INTERVAL: "5"
+    depends_on:
+      - mosquitto
+    restart: unless-stopped
+
+  edge-cam-02:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile.edge
+    environment:
+      MQTT_BROKER: mosquitto
+      DEVICE_ID: cam-02
+      DETECTION_INTERVAL: "8"
+    depends_on:
+      - mosquitto
+    restart: unless-stopped
+
+  dashboard:
+    build:
+      context: .
+      dockerfile: infra/docker/Dockerfile.dashboard
+    ports:
+      - "8501:8501"
+    environment:
+      DATABASE_URL: postgresql://edgeeye:edgeeye@postgres:5432/edgeeye
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  pg_data:
