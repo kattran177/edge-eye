@@ -26,6 +26,8 @@ from dataclasses import dataclass
 
 from ultralytics import YOLO
 
+from src.config import CONFIDENCE_THRESHOLD
+
 
 @dataclass
 class Detection:
@@ -61,7 +63,7 @@ class EdgeModel:
     def detect(
         self,
         image_path: str,
-        confidence_threshold: float = 0.4,
+        confidence_threshold: float = CONFIDENCE_THRESHOLD,
     ) -> list[Detection]:
         """
         Run object detection on an image.
