@@ -1,3 +1,14 @@
+---
+title: Edge Eye
+emoji: 👁️
+colorFrom: blue
+colorTo: green
+sdk: streamlit
+sdk_version: "1.41.1"
+app_file: app.py
+pinned: false
+---
+
 # 👁️ EdgeEye — Real-Time Edge AI Object Detection Platform
 
 A real-time edge computing system that runs lightweight ML models on simulated IoT devices, streams detections over MQTT, and visualises results on a live dashboard. Built with YOLOv8, MQTT (Mosquitto), PostgreSQL, and Streamlit.
