@@ -3,9 +3,7 @@ title: Edge Eye
 emoji: 👁️
 colorFrom: blue
 colorTo: green
-sdk: streamlit
-sdk_version: "1.41.1"
-app_file: app.py
+sdk: docker
 pinned: false
 ---
 
